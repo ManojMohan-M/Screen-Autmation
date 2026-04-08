@@ -1,31 +1,40 @@
-The Screen Automation System is an advanced industrial control solution designed to automate the alignment of printing screens using real-time computer vision. In traditional setups, aligning a screen for a 3-axis stage is done manually, which is slow and prone to error. This project digitizes that process by creating a "closed-loop" system between high-level vision sensors and industrial PLCs.
+Automated Screen Alignment for High-Speed Textile Oval Machines
+The Mission
+In textile printing, a misaligned screen is the difference between a premium t-shirt and a cleaning rag. Manually adjusting screens on a massive oval machine is a "neck-pain-inducing" task that kills productivity.
 
-The Problem
-Industrial screen printing requires micron-level precision across three axes (X, Y, and Z/Theta). Manual alignment causes downtime and material waste.
+This project gives the Oval Machine a set of high-tech eyes. We’ve automated the 3-axis screen adjustment process, ensuring that every layer of ink hits the fabric with surgical precision—automatically.
 
-The Solution
-We utilize a Distributed Intelligence model. Instead of taxing a single controller, we split the workload:
+The "Dream Team" (Architecture)
+👁️ The Scout (Master RPi 5): Perched above the screen with a Camera Module 3. It uses OpenCV to hunt for registration marks (the "+" marks). It calculates the "misalignment math" in real-time.
 
-Vision Sensing: A Master RPi 5 uses the Sony IMX708 sensor (Camera Module 3) to detect alignment markers (e.g., plus marks or edges) at high frame rates.
+📡 The Messenger (Slave RPi 5): Receives coordinate data via Wi-Fi. It acts as the bilingual diplomat, translating Python logic into Modbus commands that industrial hardware can understand.
 
-Data Gateway: A Slave RPi 5 handles the network overhead and protocol translation, ensuring the Master's vision loop remains uninterrupted by Modbus latency.
+🏗️ The Heavy Lifter (Delta AS228T PLC): The industrial backbone. It takes the "orders" and drives a 3-axis single stepper driver to physically shift the screen into the sweet spot.
 
-Industrial Execution: A Delta AS228T PLC manages the high-speed pulse outputs (PTO) required to drive the 3-axis stepper system smoothly.
+Why This is a Game Changer for Textiles
+Stop the "Stop-and-Go": Drastically reduces setup time between different print jobs.
 
-System Workflow
-Capture: Master RPi 5 detects the screen position using OpenCV.
+Wireless Flexibility: Since the Master and Slave talk via Wi-Fi, we don’t have to run long, messy communication cables along the length of the oval track.
 
-Calculate: The system computes the error offset between the current position and the target home position.
+Micron Precision: Stepper motors don't get tired or make "human errors." If it's 0.2mm off, the PLC fixes it before the first squeegee stroke.
 
-Communicate: The offset is sent via UDP over Wi-Fi to the Slave RPi.
+The Workflow (The "Ink-Sync")
+Detect: Master RPi spots the registration mark on the screen.
 
-Translate: The Slave converts the coordinates into 16-bit or 32-bit integers compatible with Modbus TCP registers.
+Calculate: Python script determines the X, Y, and Rotation (Theta) error.
 
-Actuate: The Delta PLC reads these registers and triggers the stepper drivers to move the motors until the vision sensor confirms alignment.
+Beam: Data is shot across the shop floor via UDP Sockets.
 
-Technical Challenges Overcome
-Latency Optimization: Used UDP sockets instead of TCP for faster data throughput between Raspberry Pis.
+Inject: Slave RPi injects these values directly into the Delta PLC registers.
 
-Protocol Bridging: Successfully interfaced Python-based IoT hardware with industrial PLC registers using the pymodbus library.
+Align: The PLC executes a coordinated 3-axis move. Result: Perfect Registration.
 
-Precision Mapping: Calibrated pixel-to-millimeter ratios to ensure the vision system accurately directs the physical motor movement.
+🛠 Tech Stack
+Vision: OpenCV, Python (Master/Slave).
+
+Industrial: Delta AS228T, Modbus TCP, ISPSoft (Ladder/Structured Text).
+
+Motion: 3-Axis Stepper System.
+
+💡 Fun Fact from the Factory Floor
+"Before this system, aligning a 12-color job felt like a cardio workout. Now, I spend more time drinking chai while the Raspberry Pis do the squinting for me."
